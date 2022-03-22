@@ -2,13 +2,14 @@ let containerEl = $("section.container");
 let currentDateEl = $("#currentDay");
 let saveBtnEl = $(".saveBtn");
 let taskDescriptionEl = $(".description");
+let ptimeEl = $(".hour");
 let savedTasks = [];
 let todaysDate = Date();
 
 // shows current date and tasks
 let currentDateTasks = function () {
     todaysDate = Date();
-    let day = dateFns.getDay(todaysDate);
+
     let formattedDate = dateFns.format(todaysDate, "MMMM DD, YYYY")
     currentDateEl.html(todaysDate);
 
@@ -20,8 +21,11 @@ let currentDateTasks = function () {
 
 //COME BACK TO THIS 
 // formats task zones based on time of day
-let timeFormatShader = function (date) {
-
+let timeFormatShader = function (/*date */) {
+    for (let i = 0; i < ptimeEl.length; i++) {
+        let hoursElement = $(ptimeEl[i]);
+        console.log(hoursElement.html());
+    }
 }
 
 // state support for saving task
@@ -91,3 +95,5 @@ let customizeTask = function(event) {
 $(document).ready(currentDateTasks);
 containerEl.on("click", customizeTask);
 saveBtnEl.on("click", saveTask);
+
+timeFormatShader();
