@@ -129,4 +129,4 @@ $(document).ready(currentDateTasks);
 containerEl.on("click", customizeTask);
 saveBtnEl.on("click", saveTask);
 
-timeFormatShader();
+
