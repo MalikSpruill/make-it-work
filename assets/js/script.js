@@ -6,25 +6,64 @@ let ptimeEl = $(".hour");
 let savedTasks = [];
 let todaysDate = Date();
 
+
 // shows current date and tasks
 let currentDateTasks = function () {
+    
+
     todaysDate = Date();
+    let currentDay = todaysDate.split(" ");
+    currentDay.length = 1;
+    currentDay = currentDay[0];
 
-    let formattedDate = dateFns.format(todaysDate, "MMMM DD, YYYY")
-    currentDateEl.html(todaysDate);
+    //resets saved tasks everyday
+    if (localStorage.key("day")) {
+        let storedDay = JSON.parse(localStorage.getItem("day"));
+        if (storedDay !== currentDay) {
+            localStorage.clear();
+        }
+    }
+    else {
+        localStorage.setItem("day", JSON.stringify(currentDay));
+    }
 
-    //TURN BACK ON BEFORE THE END
-    //currentTasks();
-    console.log(todaysDate);
-    console.log(formattedDate);
+    let formattedDate = dateFns.format(todaysDate, "MM/DD/YYYY hh:mm a")
+    let formattedTime = formattedDate.split(" ")[1];
+    let amPm = formattedDate.split(" ")[2];
+
+    currentDateEl.html(`${currentDay}  ${formattedDate}`);
+
+    currentTasks();
+    timeFormatShader(formattedTime, amPm);
 }
 
-//COME BACK TO THIS 
+
 // formats task zones based on time of day
-let timeFormatShader = function (/*date */) {
+let timeFormatShader = function (currentTime, amPm) {
     for (let i = 0; i < ptimeEl.length; i++) {
-        let hoursElement = $(ptimeEl[i]);
-        console.log(hoursElement.html());
+        let pElement = $(ptimeEl[i]);
+        let workHours = $(ptimeEl[i]).html();
+
+        if (parseInt(currentTime) < parseInt(workHours) && workHours.includes(amPm)) {
+            pElement.next().addClass("future").removeClass("past present");
+
+            if (parseInt(workHours) == 12) {
+                pElement.next().addClass("past").removeClass("present future");
+             } 
+        }
+        else if (parseInt(currentTime) == 12 && parseInt(currentTime) > parseInt(workHours) && workHours.includes(amPm)) {
+             
+            pElement.next().addClass("future").removeClass("past present");
+        }
+        else if (parseInt(currentTime) > parseInt(workHours) && workHours.includes(amPm)) {
+            pElement.next().addClass("past").removeClass("present future");
+        }
+        else if (parseInt(currentTime) == parseInt(workHours) && workHours.includes(amPm)) {
+            pElement.next().addClass("present").removeClass("past future");
+        }
+        else {
+            pElement.next().addClass("past").removeClass("present future");
+        }
     }
 }
 
@@ -39,10 +78,8 @@ let saveTask = function () {
         id: taskId
     };
 
-    //check if local storage contains same id as current session !!!!!!!
     savedTasks.push(saveTaskObj);
     localStorage.setItem("taskpersist", JSON.stringify(savedTasks));
-    console.log("Task has been saved!");
 }
 
 // keeps tasks on page (persists)
@@ -67,14 +104,10 @@ let currentTasks = function() {
 // allows user to customize task 
 let customizeTask = function(event) {
     let selectedElementEl = $(event.target);
-    console.log(selectedElementEl);
 
     // captures description-pane class child element and data
     if (selectedElementEl.hasClass("description-pane")) {
     let pChildEl = selectedElementEl.children();
-    console.log(pChildEl);
-    let pChildData = pChildEl.attr("data-timeslot");
-    console.log(pChildData);
 
     // makes schedule text customizable
     let textAreaEl = $("<textarea>");
